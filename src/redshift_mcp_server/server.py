@@ -131,9 +131,9 @@ async def list_tools() -> list[Tool]:
                     "sql": {
                         "type": "string",
                         "description": "The SQL to Execute"
-                    },
-                    "required": ["sql"]
-                }
+                    }
+                },
+                "required": ["sql"]
             }
         ),
         Tool(
@@ -251,31 +251,31 @@ def _get_tables(conn: Connection, schema: str) -> str:
 
 def _get_table_ddl(conn: Connection, schema: str, table: str) -> str:
    """Get DDL for a table from redshift database."""
-   
+
    with conn.cursor() as cursor:
        cursor.execute(
            """
             SELECT 'SHOW TABLE ' || quote_ident(%s) || '.' || quote_ident(%s) AS query
            """, [schema, table])
-       
+
        query = cursor.fetchone()
        if not query or not query[0]:
            return f"No DDL found for {schema}.{table}"
-       
+
        cursor.execute(query[0])
        ddl = cursor.fetchone()
        return ddl[0] if ddl and ddl[0] else f"No DDL found for {schema}.{table}"
 
 def _get_table_statistic(conn: Connection, schema: str, table: str) -> str:
    """Get statistic for a table from redshift database."""
-   
+
    with conn.cursor() as cursor:
-       
+
        cursor.execute(
            """
             SELECT 'ANALYZE ' || quote_ident(%s) || '.' || quote_ident(%s) AS query
            """, [schema, table])
-       
+
        query = cursor.fetchone()
        if not query or not query[0]:
            return f"No DDL found for {schema}.{table}"
