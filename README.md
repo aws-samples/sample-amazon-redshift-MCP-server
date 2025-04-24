@@ -45,17 +45,7 @@ RS_DATABASE=your_database
 RS_SCHEMA=your_schema  # Optional, defaults to "public"
 ```
 
-You can set these environment variables directly or use a `.env` file.
-
 ## Usage
-
-### Starting the server
-
-```bash
-# Start the server
-uv run --with mcp python-dotenv redshift-connector mcp
-mcp run src/redshift_mcp_server/server.py
-```
 
 ### Integrating with AI assistants
 
