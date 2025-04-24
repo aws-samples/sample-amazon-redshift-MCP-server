@@ -296,7 +296,7 @@ async def run():
                 server.create_initialization_options()
             )
         except Exception as e:
-            logger.error(f"MCP Server Error: {str(e)}", exc_info=True)
+            logger.warning(f"MCP Server Error: {str(e)}")
             raise
 
 
