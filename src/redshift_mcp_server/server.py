@@ -240,12 +240,12 @@ def _get_tables(conn: Connection, schema: str) -> str:
    """Get all tables in a schema from redshift database."""
    sql = f"""
         SELECT table_name FROM information_schema.tables
-        WHERE table_schema = '{schema}'
+        WHERE table_schema = %s
         GROUP BY table_name
         ORDER BY table_name
    """
    with conn.cursor() as cursor:
-       cursor.execute(sql)
+       cursor.execute(sql, [schema])
        rows = cursor.fetchall()
        tables = [row[0] for row in rows]
        return "\n".join(tables)
@@ -253,14 +253,16 @@ def _get_tables(conn: Connection, schema: str) -> str:
 def _get_table_ddl(conn: Connection, schema: str, table: str) -> str:
    """Get DDL for a table from redshift database."""
    with conn.cursor() as cursor:
-       cursor.execute(f"show table {schema}.{table}")
+       sql = f"show table {schema}.{table}"
+       cursor.execute(sql)
        ddl = cursor.fetchone()
        return ddl[0] if ddl and ddl[0] else f"No DDL found for {schema}.{table}"
 
 def _get_table_statistic(conn: Connection, schema: str, table: str) -> str:
    """Get statistic for a table from redshift database."""
    with conn.cursor() as cursor:
-       cursor.execute(f"ANALYZE {schema}.{table};")
+       sql = f"ANALYZE {schema}.{table};"
+       cursor.execute(sql)
        return f"ANALYZE {schema}.{table} command executed"
 
 async def run():
