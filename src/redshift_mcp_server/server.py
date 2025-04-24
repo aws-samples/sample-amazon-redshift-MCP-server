@@ -6,6 +6,7 @@ from mcp.server import Server
 from mcp.types import Resource, ResourceTemplate, Tool, TextContent
 from pydantic import AnyUrl
 import redshift_connector
+import re
 
 # init logger
 logging.basicConfig(
@@ -219,6 +220,8 @@ async def call_tool(name: str, args: dict) -> list[TextContent]:
     finally:
         conn.close()
 
+def is_valid_identifier(name):
+    return bool(re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', name))
 
 def _get_schemas(conn: Connection ) -> str:
    """Get all schemas from redshift database"""
@@ -252,6 +255,10 @@ def _get_tables(conn: Connection, schema: str) -> str:
 
 def _get_table_ddl(conn: Connection, schema: str, table: str) -> str:
    """Get DDL for a table from redshift database."""
+
+   if not is_valid_identifier(schema) or not is_valid_identifier(table):
+       raise ValueError(f"Invalid schema or table name: {schema}.{table}")
+   
    with conn.cursor() as cursor:
        sql = f"show table {schema}.{table}"
        cursor.execute(sql)
@@ -260,6 +267,9 @@ def _get_table_ddl(conn: Connection, schema: str, table: str) -> str:
 
 def _get_table_statistic(conn: Connection, schema: str, table: str) -> str:
    """Get statistic for a table from redshift database."""
+   if not is_valid_identifier(schema) or not is_valid_identifier(table):
+         raise ValueError(f"Invalid schema or table name: {schema}.{table}")
+   
    with conn.cursor() as cursor:
        sql = f"ANALYZE {schema}.{table};"
        cursor.execute(sql)
